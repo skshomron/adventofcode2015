@@ -12,22 +12,62 @@ namespace FindWrappingPaper_d2
     {
         static void Main(string[] args)
         {
-            int total = 0;
+            
             var fileName = "AllDimensions.txt";
             if (File.Exists(fileName))
             {
                 var s = File.ReadLines(fileName).ToList();
-                
+                List<List<int>> lwh = new List<List<int>>();
                 s.ForEach(x =>
                 {
-                    List<int>lwh = new List<int>(); 
-                    x.Split('x').ToList().ForEach(xx=>lwh.Add(int.Parse(xx)));
-                    total += ComputeArea(lwh[0], lwh[1], lwh[2]) + ComputeExtraSheet(lwh);
+                    List<int> l = new List<int>();
+                    x.Split('x').ToList().ForEach(xx => l.Add(int.Parse(xx)));
+                    lwh.Add(l);
                 });
-            }
 
-            Console.WriteLine($"{total}");
+                ComputeTotalSheet(lwh);
+
+
+                ComputeTotalRibbon(lwh);
+            }
             Console.ReadKey();
+        }
+
+        private static void ComputeTotalSheet(List<List<int>> lwh)
+        {
+            
+            var total = 0;
+            lwh.ForEach(x =>
+            {
+                total += ComputeArea(x[0], x[1], x[2]) + ComputeExtraSheet(x);
+            });
+
+            Console.WriteLine($"total sheet area = {total}");
+        }
+
+        private static void ComputeTotalRibbon(List<List<int>> lwh)
+        {
+            var total = 0;
+            lwh.ForEach(x =>
+            {
+                total += ComputeCubicFeet(x) + ComputeSmalestPerimeter(x);
+            });
+
+            Console.WriteLine($"total ribbon Lenght = {total}");
+
+        }
+
+        private static int ComputeSmalestPerimeter(List<int> ints)
+        {
+            ints.Remove(ints.Max());
+            return 2*(ints.Sum());
+        }
+
+        private static int ComputeCubicFeet(List<int> ints)
+        {
+            var total = 1;
+            ints.ForEach(x => total *= x);
+            return total;
         }
 
         static int ComputeArea(int l, int h, int w)
@@ -41,8 +81,12 @@ namespace FindWrappingPaper_d2
         {
             var max = dims.Max();
             dims.Remove(max);
-            if(dims.Count == 2)
-                return dims[0]*dims[1];
+            if (dims.Count == 2)
+            {
+                var extra = dims[0]*dims[1];
+                dims.Add(max);
+                return extra;
+            }
             throw new Exception();
         }
     }
