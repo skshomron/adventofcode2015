@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,11 +27,41 @@ namespace NiceOrNaughty_d5
 
             foreach (var entry in entryData)
             {
-                niceStrings += Contains3Voyels(entry) && ContainsDoubleCharInRow(entry) && !ContainsBadSequence(entry) ? 1 : 0;
+                //niceStrings += Contains3Voyels(entry) && ContainsDoubleCharInRow(entry) && !ContainsBadSequence(entry) ? 1 : 0;
+                niceStrings += ContainsBodygards(entry) && ContainsTwins(entry) ? 1 : 0;
             }
 
             Console.Write(niceStrings);
             Console.ReadKey();
+        }
+
+        private static bool ContainsTwins(string entry)
+        {
+            string token, restant;
+            int index = 0;
+            GetChunk(entry,index,out token, out restant);
+            while (!restant.Contains(token)&& index<entry.Length-3)
+            {
+                index++;
+                GetChunk(entry, index, out token, out restant);
+            }
+            return index < entry.Length - 3;
+        }
+
+        private static void GetChunk(string entry, int index, out string token, out string restant)
+        {
+            token = entry.Substring(index, 2);
+            restant = entry.Substring(index + 2);
+        }
+
+        private static bool ContainsBodygards(string entry)
+        {
+            for (int i = 0; i < entry.Length - 2; i++)
+            {
+                if (entry[i] == entry[2 + i])
+                    return true;
+            }
+            return false;
         }
 
         private static bool Contains3Voyels(string entry)
